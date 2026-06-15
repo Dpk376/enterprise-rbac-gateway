@@ -64,3 +64,15 @@ logging:
     com.enterprise.policy: DEBUG
     org.springframework.cloud.gateway: INFO
     org.springframework.security: INFO
+
+# Resilience4j Circuit Breaker Config
+resilience4j.circuitbreaker:
+  instances:
+    opaClient:
+      registerHealthIndicator: true
+      slidingWindowSize: 10
+      minimumNumberOfCalls: 5
+      permittedNumberOfCallsInHalfOpenState: 3
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+      waitDurationInOpenState: 5s
+      failureRateThreshold: 50
