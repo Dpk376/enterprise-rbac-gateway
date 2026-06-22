@@ -55,6 +55,7 @@ public class OpaAuthorizationFilter implements GlobalFilter, Ordered {
                 Map<String, Object> input = new HashMap<>();
                 input.put("method", method);
                 input.put("path", List.of(path.split("/")));
+                input.put("raw_path", path);
                 input.put("claims", claims);
 
                 long start = System.nanoTime();

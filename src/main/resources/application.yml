@@ -40,6 +40,7 @@ spring:
 
 # Custom OPA Configuration
 opa:
+  base-url: "http://localhost:8181"
   url: "http://localhost:8181/v1/data/authz/allow"
 
 # Actuator & Prometheus metrics
