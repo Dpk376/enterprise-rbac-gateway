@@ -1,0 +1,5 @@
+CREATE TABLE policies (
+    id VARCHAR(255) PRIMARY KEY,
+    content TEXT NOT NULL,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
