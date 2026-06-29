@@ -77,15 +77,13 @@ public class OpaAuthorizationFilter implements GlobalFilter, Ordered {
                             return chain.filter(exchange);
                         } else {
                             log.warn("Authorization denied for user: {} on path: {}", actor, path);
-                            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-                            return exchange.getResponse().setComplete();
+                            return Mono.error(new com.enterprise.policy.gateway.exception.AuthorizationDeniedException(reason));
                         }
                     });
             })
             .switchIfEmpty(Mono.defer(() -> {
                 log.warn("No authentication found for path: {}", path);
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                return exchange.getResponse().setComplete();
+                return Mono.error(new com.enterprise.policy.gateway.exception.AuthenticationRequiredException("No authentication token provided"));
             }));
     }
 

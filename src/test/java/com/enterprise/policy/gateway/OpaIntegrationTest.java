@@ -14,6 +14,10 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import com.github.tomakehurst.wiremock.WireMockServer;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -51,6 +55,23 @@ public class OpaIntegrationTest {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    private static WireMockServer wireMockServer;
+
+    @BeforeAll
+    static void setupWireMock() {
+        wireMockServer = new WireMockServer(8081);
+        wireMockServer.start();
+        wireMockServer.stubFor(get(urlPathMatching("/api/.*"))
+                .willReturn(aResponse().withStatus(200).withBody("Downstream Response")));
+    }
+
+    @AfterAll
+    static void teardownWireMock() {
+        if (wireMockServer != null) {
+            wireMockServer.stop();
+        }
+    }
 
     @Test
     void testDatabaseAndContext() {

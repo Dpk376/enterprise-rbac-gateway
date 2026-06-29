@@ -2,6 +2,9 @@ server:
   port: 8080
 
 spring:
+  webflux:
+    problemdetails:
+      enabled: true
   application:
     name: rbac-gateway
   
@@ -32,6 +35,17 @@ spring:
   # Cloud Gateway routes (example mapping everything downstream)
   cloud:
     gateway:
+      default-filters:
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 100
+            redis-rate-limiter.burstCapacity: 200
+            redis-rate-limiter.requestedTokens: 1
+            key-resolver: "#{@principalNameKeyResolver}"
+        - name: CircuitBreaker
+          args:
+            name: downstreamCircuitBreaker
+            fallbackUri: forward:/fallback
       routes:
         - id: downstream-service
           uri: http://localhost:8081
@@ -77,3 +91,16 @@ resilience4j.circuitbreaker:
       automaticTransitionFromOpenToHalfOpenEnabled: true
       waitDurationInOpenState: 5s
       failureRateThreshold: 50
+    downstreamCircuitBreaker:
+      registerHealthIndicator: true
+      slidingWindowSize: 20
+      minimumNumberOfCalls: 10
+      permittedNumberOfCallsInHalfOpenState: 3
+      automaticTransitionFromOpenToHalfOpenEnabled: true
+      waitDurationInOpenState: 10s
+      failureRateThreshold: 50
+
+resilience4j.timelimiter:
+  instances:
+    downstreamCircuitBreaker:
+      timeoutDuration: 3s
